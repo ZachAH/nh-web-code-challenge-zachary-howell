@@ -16,6 +16,15 @@ A specialized internal tool designed for healthcare coordinators to efficiently 
   - **Lab Visit**: Home → Patient → Optimal Lab → Home.
 - **State Management**: Developed using React hooks with explicit **loading states** to prevent UI flickering and eliminate infinite re-render loops. Used `useMemo` and `useCallback` for optimized performance.
 
+## 🧠 Engineering Philosophy: Determinism vs. Randomness
+
+While the initial technical prompt suggested a random generator for mileage, I made the senior-level decision to implement the **Haversine Formula**. 
+
+**The reasoning behind this choice:**
+- **System Trust**: A random generator makes the system non-deterministic. If a coordinator clicks "Find" twice for the same patient, they expect the same result. A random generator would provide a different "optimal" clinician every time, which is untrustworthy in a production healthcare environment.
+- **Business Accuracy**: By using real geographic coordinates, the tool solves the actual business problem: minimizing real-world drive time rather than just simulating a UI.
+- **Scalability**: Implementing mathematically sound logic now ensures the dispatch engine is ready for real-world integration with Geocoding APIs immediately upon release.
+
 ---
 
 ## 🏗️ Project Structure
