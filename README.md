@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# 🏥 Nice Healthcare: Clinician Dispatch Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-Currently, two official plugins are available:
+A specialized internal tool designed for healthcare coordinators to efficiently assign clinicians to home visits by calculating optimal round-trip travel distances.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Technical Approach
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Deterministic Logic (Bonus)**: To exceed the requirement for a random distance generator, I implemented the **Haversine Formula**. This ensures consistent, mathematically sound results by calculating the "as-the-crow-flies" distance between geographic coordinates.
+- **Loop Logic**:
+  - **Standard Visit**: Home → Patient → Home.
+  - **Lab Visit**: Home → Patient → Optimal Lab → Home.
+- **State Management**: Developed using React hooks with explicit **loading states** to prevent UI flickering, handle async-simulated calculations, and eliminate infinite re-render loops.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🧠 Assumptions
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+In the absence of specific product requirements for edge cases, the following engineering decisions were made:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  **Optimal Lab Selection**: I assumed the "best" lab is the one that minimizes the **total round-trip** for the clinician (Home → Patient → Lab → Home), rather than simply the lab closest to the patient. This prioritizes the clinician's total time on the road.
+2.  **Patient Location**: As no Geocoding API was provided for this assessment, the system currently anchors the patient's coordinates to **Central Minneapolis** (44.9778° N, 93.2650° W) to demonstrate the logic across the provided mock data.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Production Considerations
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. MVP Limiting Factors & User Issues
+* **Geocoding Strategy**: The current solution relies on mocked patient coordinates. In a production environment, a Geocoding API (e.g., Google Maps, Mapbox) would be integrated to convert user-entered strings into real-time latitude/longitude data.
+* **Geographic Impediments**: Haversine measures direct distance. A production-ready app must account for actual road networks, traffic congestion, and physical barriers (like the Mississippi River) that significantly impact drive time in the Twin Cities.
+* **Data Architecture**: Currently, data is stored in static mock files. For scaling to a national provider level, this would require a backend with spatial indexing (e.g., PostGIS) and API-driven data fetching.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 2. Optimization Factors (Future Roadmap)
+* **Clinician Specialty Matching**: Aligning specific patient needs (e.g., pediatric expertise) with provider credentials.
+* **Load Balancing**: Factoring in a clinician's existing daily workload to prevent provider burnout, even if they are geographically the closest.
+* **Shift Management**: Cross-referencing route duration with remaining shift hours to avoid unauthorized overtime.
+* **Predictive Routing**: Utilizing live traffic APIs to optimize for **Estimated Time of Arrival (ETA)** rather than just physical mileage.
+
+---
+
+## 📦 Installation & Setup
+
+1. **Clone and Install**:
+   ```bash
+   npm install
